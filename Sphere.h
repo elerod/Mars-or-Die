@@ -9,6 +9,7 @@ protected:
 	Vector2D position;
 	float radius;
 	float red, green, blue;
+	float r_elipse
 
 public:
 		

@@ -1,8 +1,6 @@
 #include "Sphere.h"
 
-Sphere::Sphere() {
-	SetPos(0.0, 0.0);
-}
+Sphere::Sphere() {}
 
 Sphere::~Sphere() {}
 
@@ -32,5 +30,13 @@ void Sphere::Draw() {
 	glColor3f(red, green, blue);
 	glutSolidSphere(radius, 40, 40);
 	glPopMatrix();
-
+	float PI=3.14159;
+	for(float x=0.0; x<=2*PI; x+=0.06)
+	{
+	glColor3ub(255,0,0);
+	glBegin(GL_LINES);
+		glVertex2f(r_elipse*sin(x), r_elipse/2 * cos(x));
+		glVertex2f(r_elipse*sin(x+0.06), r_elipse/2* cos(x+0.06));
+	glEnd();
+}
 }

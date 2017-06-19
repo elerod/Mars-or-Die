@@ -1,36 +1,62 @@
 #include "Sphere.h"
+#include "ETSIDI.h"
 
-Sphere::Sphere() {
-	SetPos(0.0, 0.0);
+Sphere::Sphere()
+{
 }
 
 Sphere::~Sphere() {}
-
-void Sphere::SetPos(float x, float y) {	
-	position.x = x;
-	position.y = y;
-}
-
-void Sphere::SetColor(float r, float g, float b) {
+ 
+void Sphere::SetColor(float r, float g, float b) 
+{
 	red = r;
 	green = g;
 	blue = b;
 }
 
-void Sphere::RiseRadius(float r) {
-	radius += r;
-}
 
-void Sphere::SetRadius(float r) {
+void Sphere::Draw(const char *c)
+{
+	/*glPushMatrix();
+	glTranslatef(position.x, 0, position.y);
+	glColor4f(red, green, blue, 1.0);
+	glutSolidSphere(radius, 40, 40);
+	glPopMatrix();*/
+	glColor4f(red, green, blue, 1.0);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, ETSIDI::getTexture(c).id);
+	GLUquadric  *quadObj;
+	quadObj = gluNewQuadric();
+	gluQuadricTexture(quadObj, GL_TRUE);
+	glDisable(GL_LIGHTING);
+	glPushMatrix();
+	glTranslatef(position.x, 0, position.y);
+	gluSphere(quadObj, radius, 40, 40);
+	glPopMatrix();
+	glEnable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);
+	
+	/*glDisable(GL_LIGHTING);
+	glBegin(GL_POLYGON);
+	glColor3f(1, 1, 1);
+	glTexCoord3d(0, 1, -1024);  glVertex3f(position.x - radius, -10, position.y + radius);
+	glTexCoord3d(1, 1, 1024);  glVertex3f(position.x + radius, -10, position.y + radius);
+	glTexCoord3d(1, 0, -1024);  glVertex3f(position.x + radius, -10, position.y - radius);
+	glTexCoord3d(0, 0, 1024);  glVertex3f(position.x - radius, -10, position.y - radius);
+	glEnd();
+	glEnable(GL_LIGHTING);
+	glDisable(GL_TEXTURE_2D);*/
+}
+	
+
+
+
+void Sphere::SetRadius(float r)
+{
 	radius = r;
 }
 
-void Sphere::Draw() {
-
-	glPushMatrix();
-	glTranslatef(position.x, position.y, 0);
-	glColor3f(red, green, blue);
-	glutSolidSphere(radius, 40, 40);
-	glPopMatrix();
-
+float  Sphere::GetRadius()
+{
+	return radius;
 }

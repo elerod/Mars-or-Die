@@ -1,14 +1,17 @@
 #pragma once
 #include "Sphere.h"
-class Planet : public Sphere{
+#include "MovingObject.h"
+#include <math.h>
 
-	float spin;
-	Vector2D vel, ac_n, ac_t;
-
+class Planet : public Sphere, public MovingObject
+{
 public:
 
 	Planet();
 	~Planet();
 
+	void Draw(const char *c);
+	void Move();
+	void SetIni(float ir,float ig, float ib, float irad, float iror, float plan);
 };
 

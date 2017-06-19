@@ -1,24 +1,21 @@
-#pragma once
+#pragma	once
+#include <iostream>
 #include "Vector2D.h"
 #include "glut.h"
+#include <math.h>
+#include "Object.h"
+using namespace std;
 
-class Sphere
+class Sphere : virtual public Object
 {
 protected:
-
-	Vector2D position;
 	float radius;
-	float red, green, blue;
-
 public:
-		
 	Sphere();
 	~Sphere();
-
-	void Draw();
+	virtual void Draw(const char *c);
 	void SetColor(float r, float g, float b);
-	void SetRadius(float r);
-	void RiseRadius(float r);
-	void SetPos(float x, float y);
+	void SetRadius(float);
+	float GetRadius();
 };
 

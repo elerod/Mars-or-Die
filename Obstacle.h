@@ -1,13 +1,17 @@
 #pragma once
-#include "Sphere.h"
-#include "MovingObject.h"
 #include "ETSIDI.h"
-class Obstacle:public Sphere, public MovingObject
+#include "Interaction.h"
+#include "Vector2.h"
+
+class Obstacle
 {
+protected:
+	ETSIDI::Sprite *image;
 public:
-	Obstacle(void);
-	virtual ~Obstacle(void);
-	void SetPos(float ix, float iy);
-	void SetAcc(float ix, float iy);
+	Obstacle();
+	~Obstacle();
+	virtual void Draw(Vector2 pos)=0;
+	ETSIDI::Sprite getImage() { return *image; }
+	friend class Interaction;
 };
 

@@ -4,6 +4,7 @@
 
 Interaction::Interaction()
 {
+	
 }
 
 
@@ -11,15 +12,22 @@ Interaction::~Interaction()
 {
 }
 
-bool Interaction::ProximityOrbit(Vector2 planet_pos, Vector2 ship_pos)
-{
-	Vector2 r = planet_pos - ship_pos;
-	float d = sqrtf(pow(r.x, 2) + pow(r.y, 2));
-
-	if (d < 30)
-	{
+bool Interaction::ColisionExplosion(Obstacle *as,Ship &sh) {
+	if (sh.ship->collides(*(as->image))) {
 		return true;
 	}
-	else
-		return false;
+	return false;
 }
+bool Interaction::ColisionFuel(class Obstacle *fuel, class Ship &sh) {
+	if (sh.ship->collides(*(fuel->image))) {
+		return true;
+	}
+	return false;
+}
+
+/*bool Interaction::ColisionShot(class Obstacle *as, class Shot &st) {
+	Vector2 aux = st.getPos() - (*(as->image).getPos());
+	if (sqrt(aux.x*aux.x + aux.y + aux.y) < 20)
+		return true;
+	else return false;
+}*/

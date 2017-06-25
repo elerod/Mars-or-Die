@@ -1,32 +1,30 @@
 #pragma once
-#include "Vector2D.h"
-#include "Planet.h"
-#include "MovingObject.h"
-#include "glut.h"
 #include "ETSIDI.h"
-
-
-class Ship : public MovingObject
+#include "Vector2.h"
+#include "Interaction.h"
+#include "Shot.h"
+#include "glut.h"
+class Ship
 {
-	float d;//= sqrt(pow(position.x, 2) + pow(position.y, 2));
-	float radius,t;
-	Vector2 m, planetO;
-	bool orbit;
-
+	ETSIDI::SpriteSequence *up, *down;
+	ETSIDI::Sprite *ship;
+	Vector2 position, velocity, acc;
+	float angle;
+	class Shot shot[10];
+	int dim;
+	int move;
+	long time;
 public:
-
-	Ship();
+	Ship(const char *name);
 	virtual ~Ship();
-
-	void Draw(int n);
-	void Move();
-	void GetAV(Vector2);
-	void OrbitAround(Vector2);
-
-	void SetT(float t);
-	float GetT();
-
-	void SetOrbit(bool);
-	bool GetOrbit();
+	void Move(float t);
+	void Initialize();
+	void SpecialKey(int key);
+	void Draw();
+	Vector2 getPos();
+	void Key(unsigned char key);
+	void SetVel(float x, float y);
+	Shot* getShot(int i);
+	friend class Interaction;
 };
 

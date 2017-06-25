@@ -109,6 +109,7 @@ using namespace std;
 		ETSIDI_API virtual void draw();
 		ETSIDI_API virtual void loop();
 		void setPos(float x, float y);
+		Vector2D getPos();
 		void setVel(float vx, float vy);
 		void setSize(float w, float h);
 		void setCenter(float cx, float cy); 
@@ -177,10 +178,12 @@ using namespace std;
 			_width = w;
 			_height = h;
 	}
+	inline void Sprite::setVel(float vx, float vy) { vel.x = vx;vel.y = vy; }
 	inline double Sprite::getAngle() const {return _angle;}
 	inline void Sprite::setPos(float x, float y){pos.x=x;pos.y=y;}
 	inline void Sprite::setCenter(float cx, float cy){anchor.x=cx; anchor.y=cy;} 
 	inline void Sprite::flip(bool h,bool v){horizontal_flip=h; vertical_flip=v;}
 	inline bool Sprite::isFlippedH() const{return horizontal_flip;}
 	inline bool Sprite::isFlippedV() const{return vertical_flip;}
+	inline Vector2D Sprite::getPos() { return pos; }
 }//ETSIDI

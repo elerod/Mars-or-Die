@@ -1,84 +1,101 @@
 #include "Ship.h"
 
-Ship::Ship()	
+
+
+Ship::Ship(const char *name)
 {
-	d= sqrt(pow(position.x, 2) + pow(position.y, 2));
-	alpha = 0;
-	radius = 1;
-	vel.x = 0;
-	vel.y = 0;
+	
+	dim = 0;
+	move = 0;
+
+	up = new ETSIDI::SpriteSequence("textures/Flame.png", 5, 5, true, position.x, position.y+2, 0.1, 20);
+	up->setAngle(-90);
+
+	down = new ETSIDI::SpriteSequence("textures/Flame.png", 5, 5, true, position.x, position.y-2,0.1,20);
+	down->setAngle(-90);
+
+	position.x = -20;
+	position.y = 0;
+
+	ship = new ETSIDI::Sprite(name,position.x,position.y, 25, 10);
+	angle = 0.0F;
+	
+}
+
+void Ship::Initialize() {
+	velocity.x = 1.0F;
+	velocity.y = 1.0F;
 	acc.x = 0;
 	acc.y = 0;
-	t = 0.5;
-	orbit = false;
+	
+}
+Ship::~Ship()
+{
+	delete ship;
 }
 
-Ship::~Ship()	{}
+void Ship::Move(float t) {
+	if(position.x<1000) position.x = position.x + velocity.x*cos(angle*3.141593/180)*t + acc.x*cos(angle*3.141593 / 180)*pow(t, 2);
 
-void Ship::Move()
-{
+	if(-300<position.y<300) position.y = position.y + velocity.y*sin(angle*3.141593 / 180)*t + acc.y*sin(angle*3.141593 / 180)*pow(t, 2);
 
-	acc = m - position;
-	vel.x = position.x * t;
-	vel.y = position.y * t;
-	MovingObject::Move();
+	if(velocity.x>0)velocity.x = velocity.x + acc.x*t;
+
+	if(velocity.y>0)velocity.y = velocity.y + acc.y*t;
 }
+void Ship::SpecialKey(int key) {
 
-void Ship::GetAV(Vector2 marsP)
-{
-	m = marsP;
-}
-
-void Ship::SetOrbit(bool s)
-{
-	orbit = s;
-}
-
-bool Ship::GetOrbit()
-{
-	return orbit;
-}
-
-void Ship::OrbitAround(Vector2 planet_pos)
-{
-	planetO = planet_pos;
-	alpha += omega * 0.05;
-	position.x = 9 * cosf(alpha);
-	position.y = 9 * sinf(alpha);
-}
-
-void Ship::Draw(int n)
-{
-	if (n==1) {
-		if (orbit)
-		{
-			glPushMatrix();
-			glColor3f(1.0, 1.0, 1.0);
-			glTranslatef(planetO.x, 0, planetO.y);
-			glTranslatef(position.x, 0, position.y);
-			glutSolidSphere(radius, 15, 15);
-			glPopMatrix();
-		}
-		else
-		{
-			glPushMatrix();
-			glColor3f(1.0, 1.0, 1.0);
-			glTranslatef(position.x, 0, position.y);
-			glutSolidSphere(radius, 15, 15);
-			glPopMatrix();
-		}
+	if (key == GLUT_KEY_UP) {
+		if (angle < 90)
+			angle += 1;
+		down->loop();
 	}
-	if (n == 3) {
-		ETSIDI::Sprite plane("textures/Nave.png");
+	else if (key == GLUT_KEY_DOWN) {
+		if (angle > -90)
+			angle -= 1;
+		up->loop();
 	}
+	else if (key == GLUT_KEY_RIGHT) {
+		acc = acc + 0.1;
+	}
+	else if (key == GLUT_KEY_LEFT) {
+		acc.x = acc.x - 0.1;
+		acc.y = acc.y - 0.1;
+	}
+
+
 }
 
-void Ship::SetT(float a)
+void Ship::Key(unsigned char key) {
+	time = ETSIDI::getMillis();
+	shot[dim++].Move(key, position, velocity);
+	if(key==' ')shot[move++].Move(key,position,velocity);
+	if (time > 1000) {
+		move--;
+		time = 0;
+	}
+
+}
+void Ship::SetVel(float x, float y)
 {
-	t = a;
+	velocity.x = x;
+	velocity.y = y;
+}
+Shot* Ship::getShot(int i)
+{
+	return &shot[i];
+}
+void Ship::Draw() {
+	ship->setAngle(angle);
+	ship->setPos(position.x, position.y);
+	ship->draw();
+	up->setAngle(angle + 90);
+	up->setPos(position.x+2-40*cos(angle*3.141593 / 180), position.y+2-40*sin(angle*3.141593 / 180));
+	down->setAngle(angle + 90);
+	down->setPos(position.x-2-40*cos(angle*3.141593 / 180), position.y-2-40*sin(angle*3.141593 / 180));
+	up->draw();
+	down->draw();
+	for (int i = 0;i < 10;i++) shot[i].Draw(position);
 }
 
-float Ship::GetT()
-{
-	return t;
-}
+Vector2 Ship::getPos() { return position; }

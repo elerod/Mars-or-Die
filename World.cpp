@@ -1,128 +1,99 @@
-﻿#define EARTH 1.6
-#define MARS 0.8
-#define VENUS 3.9
-#define MERCURY 4.8
-
 #include "World.h"
-using ETSIDI::getTexture;
+#include <fstream>
+#include <iostream>
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
 
-World::World() 
-{ 
-	ship = 0; 
-}
-
-World::~World() {delete ship; }
-
-void World::Initialize() {
-
-	sloMo = false;//slowmotion
-	srand(time(NULL));
-
-	x_eye = 0;
-	y_eye = 400;
-	z_eye = 400;
-	//Inicializador del sol
-	sun.SetColor(1.0F, 1.0F, 1.0F);
-	sun.SetRadius(20);
-	//Se inicializa la tierra
-	earth.SetIni(1.0F,1.0F,1.0F,8.5,210,EARTH);//4.5
-	//Se inicializa marte
-	mars.SetIni(1.0F,1.0F,1.0F,7,350,MARS);//3
-	//Se inicializa mercurio
-	mercury.SetIni(1.0F,1.0F,1.0F,6,30,MERCURY);//2
-	//Se inicializa venus
-	venus.SetIni(1.0F,1.0F,1.0F,6.8,60,VENUS);//2.8
-
-	ETSIDI::playMusica("music/home_song.mp3", true);
-
-}
-
-void World::Draw(int n) 
+World::World()
 {
-	gluLookAt(x_eye, y_eye, z_eye,  // posicion del ojo
-		0.0, -90, 30,      // hacia que punto mira  (0,0,0) 
-		0.0, 1.0, 0.0);      // definimos hacia arriba (eje Y) 
+	elim = 0;
+	points = 0;
+	spacecraft = new Ship("textures/spacecraft.png");
+	for (int i = 0;i < 50;i++) Obstacle[i] = new Asteroid("textures/Asteroid.png");
+	for (int i = 50;i < 100;i++)Obstacle[i] = new Asteroid("textures/Asteroid3.png");
+	for (int i = 100;i < 150;i++)Obstacle[i] = new Asteroid("textures/Asteroid2.png");
+	for (int i =150;i < 380;i++)Obstacle[i] = new Asteroid("textures/Asteroid3.png");
+	for(int i=380;i<400;i++) Obstacle[i] = new Alien("textures/Alien.png");
+	for (int i = 400;i < 500;i++) Obstacle[i] = new Fuel("textures/Fuel.png");
+}
 
 
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, ETSIDI::getTexture("textures/space1.png").id);
-	glDisable(GL_LIGHTING);
-	glBegin(GL_POLYGON);
-	glColor3f(1, 1, 1); 
-	glTexCoord2d(0, 1);  glVertex3f(-300, -50, 500);
-	glTexCoord2d(1, 1);  glVertex3f(-300, -50, -500);
-	glTexCoord2d(1, 0);  glVertex3f(300, -50, -500);
-	glTexCoord2d(0, 0);  glVertex3f(300, -50, 500);
+World::~World()
+{
+}
+void World::Initialize() {
+	x_eye = 0;
+	z_eye = 100;
+	y_eye = 0;
+	spacecraft->Initialize();
+}
 
-	glEnd();
-	
-	glEnable(GL_LIGHTING);
-	glDisable(GL_TEXTURE_2D);
+void World::Draw() {
 
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
+	gluLookAt((spacecraft->getPos()).x, (spacecraft->getPos()).y, z_eye,  // posicion del ojo
+		(spacecraft->getPos()).x, (spacecraft->getPos()).y, 0.0F,      // hacia que punto mira  (0,0,0) 
+		0.0, 1.0, 0.0);      // definimos hacia arriba (eje Y)   
+	animation.Draw();
+	spacecraft->Draw();
 
-	sun.Draw("textures/Sun.png");
-	mercury.Draw("textures/Mercury.png");
-	earth.Draw("textures/Tierra.png");
-	mars.Draw("textures/Mars.png");
-	venus.Draw("textures/Venus.png");
-	
+	for (int i = 0;i < 500-elim;i++) {
+		Obstacle[i]->Draw(spacecraft->getPos());
 
-	
-	if (ship)
-		ship->Draw(n);
+	}
+
+	int size = sizeof(points)*4;
+	char *pidStr = new char[size + 1];
+	_itoa_s(points,pidStr,size+1,10);
+	ETSIDI::setTextColor(1, 1, 1);
+	ETSIDI::setFont("fonts/nasalization-rg.ttf", 30);
+	ETSIDI::printxy(pidStr,spacecraft->getPos().x+ 30,spacecraft->getPos().y+ 33);
+
 
 }
 
-int World::Timer() 
-{		
-	int aux=0;
-	if (ship) {
-		if (Interaction::ProximityOrbit(mars.GetPos(), ship->GetPos()))
-			ship->SetOrbit(true);
+void World::Key(unsigned char key) {
+	spacecraft->Key(key);
+}
 
-		if (ship->GetOrbit()) {
-			ship->OrbitAround(mars.GetPos());
-			aux = 1;
-		}// with this condition on you are able to pass to the next phase
-		else {
-			ship->Move();
-			aux = 0;
+void World::SpecialKey(int key) {
+	spacecraft->SpecialKey(key);
+}
+
+void World::Move(float t) {
+
+	spacecraft->Move(t);
+
+	for (int i = 0;i < 400;i++) {
+		if (Interaction::ColisionExplosion(Obstacle[i], *spacecraft)) {
+			animation.SetPos(spacecraft->getPos()+5);
+			animation.Move();
+			spacecraft->SetVel(0, 0);
+		}
+		/*for (int j = 0;j < 10;j++) {
+			if (Interaction::ColisionShot(Obstacle[i], *spacecraft->getShot(j))) {
+				animation.SetPos((*spacecraft)->getShot(j));
+				animation.Move();
+				delete Obstacle[i];
+				elim++;
+					for (int k = i;k < 500 - elim;k++) Obstacle[k] = Obstacle[k + 1];
+		}*/
+	}
+
+	for (int i = 400;i < 500-elim;i++) {
+		if (Interaction::ColisionFuel(Obstacle[i], *spacecraft)) {
+			points += 100;
+			Obstacle[i]->~Obstacle();
+			elim++;
+			for (int j = i;j < 500-elim;j++) Obstacle[j] = Obstacle[j + 1];
+			std::ofstream miFichero("test.txt");
+			miFichero << points << std::endl;
 		}
 	}
-	earth.Move();
-	mercury.Move();
-	mars.Move();
-	venus.Move();
-	return aux;
-	
-}
 
-void World::Key(unsigned char key, int x_t, int y_t)
-{
-	if (key == ' ')
-	{
-		if (!sloMo)
-		{
-			sloMo = true;
-			ship = new Ship;
-			ship->SetPos(earth.GetPos());
-			ship->SetOmega(earth.GetOmega());
-			ship->GetAV(mars.GetPos());
-			earth.SetOmega(EARTH * 0.1);
-			mars.SetOmega(MARS * 0.1);
-			venus.SetOmega(VENUS * 0.1);
-			mercury.SetOmega(MERCURY * 0.1);
-		}
-		else
-		{
-			sloMo = false;
-			earth.SetOmega(EARTH);
-			mars.SetOmega(MARS);
-			mercury.SetOmega(MERCURY);
-			venus.SetOmega(VENUS);
-			ship->SetT(2.5);
-		}
+	time=ETSIDI::getMillis();
+	if (time > 12000) {
+		points += 10;
+		time = 0;
 	}
 }

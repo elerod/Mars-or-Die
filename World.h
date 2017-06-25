@@ -1,34 +1,31 @@
-#pragma	once
-#include "Planet.h"
-#include "Interaction.h"
-#include "Sphere.h"
-#include "Ship.h"
-#include <time.h>
-#include <math.h>
-#include "ETSIDI.h"
+#pragma once
 #include "glut.h"
-#include "Skeleton.h"
+#include "Ship.h"
+#include "Obstacle.h"
+#include "Asteroid.h"
+#include "Interaction.h"
+#include "Animation.h"
+#include "Alien.h"
+#include "Fuel.h"
+#include "Vector2.h"
+#define MAX 1000
 
-
-class World:public Skeleton
+class World
 {
-	Sphere sun;
-	Ship *ship;
-	Planet earth, mars, venus, mercury;
-	Planet moon;
-	Vector2 z;
 	float x_eye, y_eye, z_eye;
-	float theta, d;
-	bool sloMo;
-
+	Ship *spacecraft;
+	Obstacle *Obstacle[MAX];
+	Animation animation;
+	int points;
+	long time;
+	int elim;
 public:
-
 	World();
-	virtual ~World();
-
+	~World();
+	void Draw();
 	void Initialize();
-	void Draw(int n);
-	int Timer();
-	void Key(unsigned char key, int x_t, int y_t);
+	void SpecialKey(int key);
+	void Move(float t);
+	void Key(unsigned char key);
 };
 

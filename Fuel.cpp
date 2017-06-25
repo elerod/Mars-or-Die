@@ -1,22 +1,22 @@
 #include "Fuel.h"
-#define MAX_X 300
-#define MAX_Y 400
-#define MAX_R 20
-#define MAX_A 1
+#define MAX_X 1000
+#define MAX_Y -300
+#define MAX_H 5
+#define MAX_W 5
+
+
 
 Fuel::Fuel(const char *name)
 {
-	P = new ETSIDI::Sprite(name, rand() % MAX_X, rand() % MAX_Y, rand() % MAX_R);
-//	SetRadius(MAX_R);//Valor random de tamaño entre 0 y 20
-//	SetPos(rand() % MAX_X, rand() % MAX_Y);
-//	SetAcc(rand() % MAX_A, rand() % MAX_A);
+	image = new ETSIDI::Sprite(name, rand() % MAX_X, rand() % 600 + MAX_Y, MAX_W, MAX_H);
 }
 
 
-Fuel::~Fuel(void)
+
+Fuel::~Fuel()
 {
-	delete P;
 }
-void Fuel::Draw() {
-	Sphere::Draw("textures/Fuel.png");
+
+void Fuel::Draw(Vector2 pos) {
+	image->draw();
 }

@@ -1,10 +1,11 @@
 #pragma once
 #include "Obstacle.h"
-class Fuel :public Obstacle
+class Alien:public Obstacle
 {
+	float x, y;
 public:
-	Fuel(const char *name);
-	virtual ~Fuel();
+	Alien(const char *name);
+	~Alien();
 	void Draw(Vector2 pos);
 	friend class Interaction;
 };
